@@ -1,0 +1,40 @@
+# Build outputs
+build/
+app/
+*.o
+*.out
+*.exe
+
+# Generated instance binaries/files
+input_files/generator
+input_files/exe
+input_files/instancia_*.txt
+
+# Experiment outputs
+resultados*.csv
+resultados_*.csv
+results/
+scripts/resultados*.csv
+scripts/*resultados*.csv
+scripts/*.png
+*.png
+
+# Python cache and environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+scripts/venv/
+
+# Editor/local files
+.vscode/
+.idea/
+.DS_Store
+
+# Assignment/local reference material
+assignment.pdf
+
+# Misc temporary files
+*.tmp
+*.log
