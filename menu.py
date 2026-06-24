@@ -11,6 +11,7 @@ EXEC = ROOT / "app" / "exe"
 GEN = INPUT_DIR / "generator"
 CSV_EXPERIMENTOS = ROOT / "resultados_experimentos.csv"
 STATS_MENU = ROOT / "scripts" / "stats_menu.py"
+PLOTS_MENU = ROOT / "scripts" / "plots_menu.py"
 INSTANCES_PER_COMBINATION = 10
 METHODS = ["dynamic", "backtracking", "bnb"]
 TIMEOUT = 3600
@@ -179,6 +180,16 @@ def gerar_tabela_estatistica():
     subprocess.run(["/usr/bin/python3.12", str(STATS_MENU)], cwd=ROOT, check=True)
 
 
+def gerar_graficos():
+    stats_file = ROOT / "resultados_experimentos_stats.csv"
+    if not stats_file.exists():
+        print(f"Tabela estatistica nao encontrada: {stats_file}")
+        print("Gere a tabela pela opcao 3 antes de gerar os graficos.")
+        return
+
+    subprocess.run(["/usr/bin/python3.12", str(PLOTS_MENU)], cwd=ROOT, check=True)
+
+
 def gerar_uma_combinacao():
     if not garantir_binarios():
         return
@@ -236,10 +247,11 @@ def menu():
         print("1 - Compilar tudo")
         print("2 - Rodar experimentos e gerar CSV")
         print("3 - Gerar tabela estatistica do CSV")
-        print("4 - Gerar 10 instancias para uma combinacao")
-        print("5 - Rodar Programacao Dinamica")
-        print("6 - Rodar Backtracking")
-        print("7 - Rodar Branch and Bound")
+        print("4 - Gerar graficos da tabela estatistica")
+        print("5 - Gerar 10 instancias para uma combinacao")
+        print("6 - Rodar Programacao Dinamica")
+        print("7 - Rodar Backtracking")
+        print("8 - Rodar Branch and Bound")
         print("0 - Sair")
 
         opcao = input("Escolha uma opcao: ").strip()
@@ -252,12 +264,14 @@ def menu():
             elif opcao == "3":
                 gerar_tabela_estatistica()
             elif opcao == "4":
-                gerar_uma_combinacao()
+                gerar_graficos()
             elif opcao == "5":
-                rodar_um_metodo("dynamic")
+                gerar_uma_combinacao()
             elif opcao == "6":
-                rodar_um_metodo("backtracking")
+                rodar_um_metodo("dynamic")
             elif opcao == "7":
+                rodar_um_metodo("backtracking")
+            elif opcao == "8":
                 rodar_um_metodo("bnb")
             elif opcao == "0":
                 print("Saindo.")

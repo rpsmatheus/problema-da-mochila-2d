@@ -203,10 +203,11 @@ O menu mostra:
 1 - Compilar tudo
 2 - Rodar experimentos e gerar CSV
 3 - Gerar tabela estatistica do CSV
-4 - Gerar 10 instancias para uma combinacao
-5 - Rodar Programacao Dinamica
-6 - Rodar Backtracking
-7 - Rodar Branch and Bound
+4 - Gerar graficos da tabela estatistica
+5 - Gerar 10 instancias para uma combinacao
+6 - Rodar Programacao Dinamica
+7 - Rodar Backtracking
+8 - Rodar Branch and Bound
 0 - Sair
 ```
 
@@ -317,7 +318,32 @@ scripts/stats_menu.py
 
 Esse script usa `pandas`.
 
-### Opcao 4 - Gerar 10 instancias para uma combinacao
+### Opcao 4 - Gerar graficos da tabela estatistica
+
+Le o arquivo:
+
+```text
+resultados_experimentos_stats.csv
+```
+
+e gera os graficos:
+
+```text
+scripts/tempo_vs_n_menu.png
+scripts/tempo_vs_W_menu.png
+scripts/tempo_vs_V_menu.png
+scripts/heatmap_dynamic_menu.png
+```
+
+O script usado e:
+
+```text
+scripts/plots_menu.py
+```
+
+Antes de usar essa opcao, gere a tabela estatistica pela opcao 3.
+
+### Opcao 5 - Gerar 10 instancias para uma combinacao
 
 Pede apenas um valor para cada parametro:
 
@@ -344,14 +370,14 @@ input_files/instancia_n200_W1000_V1000_i2.txt
 input_files/instancia_n200_W1000_V1000_i10.txt
 ```
 
-### Opcoes 5, 6 e 7 - Rodar apenas um algoritmo
+### Opcoes 6, 7 e 8 - Rodar apenas um algoritmo
 
 Opcoes:
 
 ```text
-5 - Programacao Dinamica
-6 - Backtracking
-7 - Branch and Bound
+6 - Programacao Dinamica
+7 - Backtracking
+8 - Branch and Bound
 ```
 
 O menu pede o nome ou caminho da instancia. Pode digitar apenas o nome:
@@ -472,6 +498,15 @@ resultados_experimentos.csv
 
 ```text
 resultados_experimentos_stats.csv
+```
+
+3. Depois escolha `4` para gerar os graficos:
+
+```text
+scripts/tempo_vs_n_menu.png
+scripts/tempo_vs_W_menu.png
+scripts/tempo_vs_V_menu.png
+scripts/heatmap_dynamic_menu.png
 ```
 
 ### Pelo terminal
@@ -656,6 +691,12 @@ Gerar tabela estatistica manualmente:
 /usr/bin/python3.12 scripts/stats_menu.py
 ```
 
+Gerar graficos manualmente:
+
+```bash
+/usr/bin/python3.12 scripts/plots_menu.py
+```
+
 ## 16. Fluxo Recomendado Para o Trabalho
 
 1. Entrar na pasta do projeto:
@@ -688,4 +729,13 @@ resultados_experimentos.csv
 resultados_experimentos_stats.csv
 ```
 
-8. Usar os CSVs gerados no relatorio do trabalho.
+8. Escolher opcao `4` para gerar os graficos:
+
+```text
+scripts/tempo_vs_n_menu.png
+scripts/tempo_vs_W_menu.png
+scripts/tempo_vs_V_menu.png
+scripts/heatmap_dynamic_menu.png
+```
+
+9. Usar os CSVs e graficos gerados no relatorio do trabalho.
