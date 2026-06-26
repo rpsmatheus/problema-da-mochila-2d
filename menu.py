@@ -3,6 +3,7 @@ import csv
 import os
 import subprocess
 import time
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
@@ -14,7 +15,7 @@ STATS_MENU = ROOT / "scripts" / "stats_menu.py"
 PLOTS_MENU = ROOT / "scripts" / "plots_menu.py"
 INSTANCES_PER_COMBINATION = 10
 METHODS = ["dynamic", "backtracking", "bnb"]
-TIMEOUT = 3600
+TIMEOUT = 7200
 
 
 def parse_lista_inteiros(texto):
@@ -88,6 +89,19 @@ def gerar_instancias(n, w, v):
     )
 
 
+def limpar_instancias():
+    print(f"\nProcurando instancias antigas em {INPUT_DIR}...")
+    apagados = 0
+    for arquivo in INPUT_DIR.glob("*.txt"):
+        try:
+            arquivo.unlink()
+            apagados += 1
+        except Exception as e:
+            print(f"Erro ao apagar {arquivo.name}: {e}")
+    
+    print(f"Limpeza concluida! {apagados} arquivo(s) .txt apagado(s) com sucesso.")
+
+
 def caminho_instancia(n, w, v, instance_id):
     return INPUT_DIR / f"instancia_n{n}_W{w}_V{v}_i{instance_id}.txt"
 
@@ -121,7 +135,7 @@ def rodar_algoritmo(instancia, metodo, mostrar_saida=False):
         return None, TIMEOUT, True
 
 
-def rodar_experimentos():
+def rodar_experimentos(ignorar_bt=False):
     if not garantir_binarios():
         return
 
@@ -129,18 +143,27 @@ def rodar_experimentos():
     ws = pedir_lista("pesos maximos W. Ex: 100, 200, 300")
     vs = pedir_lista("volumes maximos V. Ex: 100, 200, 300")
 
-    total = len(ns) * len(ws) * len(vs) * INSTANCES_PER_COMBINATION * len(METHODS)
+    # Filtra os métodos caso a opção 9 tenha sido escolhida
+    metodos_execucao = ["dynamic", "bnb"] if ignorar_bt else METHODS
+    
+    total = len(ns) * len(ws) * len(vs) * INSTANCES_PER_COMBINATION * len(metodos_execucao)
     atual = 0
 
     print(f"\nTotal de execucoes: {total}")
     print(f"CSV de saida: {CSV_EXPERIMENTOS}\n")
 
-    with CSV_EXPERIMENTOS.open("w", newline="") as arquivo:
+    file_exists = CSV_EXPERIMENTOS.exists()
+    mode = "a" if file_exists else "w"
+
+    with CSV_EXPERIMENTOS.open(mode, newline="") as arquivo:
         writer = csv.writer(arquivo)
-        writer.writerow([
-            "N", "W", "V", "Instancia", "Metodo",
-            "Lucro", "Tempo", "Timeout"
-        ])
+        
+        # Escreve o cabeçalho apenas se o arquivo for novo
+        if not file_exists:
+            writer.writerow([
+                "N", "W", "V", "Instancia", "Metodo",
+                "Lucro", "Tempo", "Timeout"
+            ])
 
         for n in ns:
             for w in ws:
@@ -151,7 +174,7 @@ def rodar_experimentos():
                     for instance_id in range(1, INSTANCES_PER_COMBINATION + 1):
                         instancia = caminho_instancia(n, w, v, instance_id)
 
-                        for metodo in METHODS:
+                        for metodo in metodos_execucao:
                             atual += 1
                             print(
                                 f"[{atual}/{total}] "
@@ -168,7 +191,7 @@ def rodar_experimentos():
                             ])
                             arquivo.flush()
 
-    print(f"\nExperimentos finalizados. CSV gerado em: {CSV_EXPERIMENTOS}")
+    print(f"\nExperimentos finalizados. CSV salvo em: {CSV_EXPERIMENTOS}")
 
 
 def gerar_tabela_estatistica():
@@ -227,6 +250,13 @@ def pedir_caminho_instancia():
     return None
 
 
+def extrair_dados_arquivo(nome_arquivo):
+    match = re.search(r"instancia_n(\d+)_W(\d+)_V(\d+)_i(\d+)\.txt", nome_arquivo)
+    if match:
+        return int(match.group(1)), int(match.group(2)), int(match.group(3)), int(match.group(4))
+    return None, None, None, None
+
+
 def rodar_um_metodo(metodo):
     if not garantir_binarios():
         return
@@ -240,18 +270,39 @@ def rodar_um_metodo(metodo):
     if timeout:
         print(f"\nTimeout de {TIMEOUT}s atingido.")
 
+    salvar = input("\nDeseja salvar esse resultado automaticamente no CSV? (s/n): ").strip().lower()
+    if salvar == 's':
+        n, w, v, inst_id = extrair_dados_arquivo(instancia.name)
+        if n is not None:
+            file_exists = CSV_EXPERIMENTOS.exists()
+            with CSV_EXPERIMENTOS.open("a", newline="") as arquivo:
+                writer = csv.writer(arquivo)
+                if not file_exists:
+                    writer.writerow(["N", "W", "V", "Instancia", "Metodo", "Lucro", "Tempo", "Timeout"])
+                writer.writerow([
+                    n, w, v, inst_id, metodo,
+                    f"{lucro:.5f}" if lucro is not None and not timeout else "",
+                    f"{tempo:.5f}",
+                    int(timeout)
+                ])
+            print("✅ Resultado salvo com sucesso no CSV!")
+        else:
+            print("❌ Erro: O nome do arquivo não segue o padrão gerado. Não foi possível extrair os dados para o CSV.")
+
 
 def menu():
     while True:
         print("\n========== MENU ==========")
         print("1 - Compilar tudo")
-        print("2 - Rodar experimentos e gerar CSV")
+        print("2 - Rodar experimentos e gerar CSV (Os 3 algoritmos)")
         print("3 - Gerar tabela estatistica do CSV")
         print("4 - Gerar graficos da tabela estatistica")
         print("5 - Gerar 10 instancias para uma combinacao")
         print("6 - Rodar Programacao Dinamica")
         print("7 - Rodar Backtracking")
         print("8 - Rodar Branch and Bound")
+        print("9 - Rodar experimentos (SEM Backtracking)")
+        print("10 - Limpar instancias antigas (.txt)")
         print("0 - Sair")
 
         opcao = input("Escolha uma opcao: ").strip()
@@ -260,7 +311,7 @@ def menu():
             if opcao == "1":
                 compilar_tudo()
             elif opcao == "2":
-                rodar_experimentos()
+                rodar_experimentos(ignorar_bt=False)
             elif opcao == "3":
                 gerar_tabela_estatistica()
             elif opcao == "4":
@@ -273,6 +324,10 @@ def menu():
                 rodar_um_metodo("backtracking")
             elif opcao == "8":
                 rodar_um_metodo("bnb")
+            elif opcao == "9":
+                rodar_experimentos(ignorar_bt=True)
+            elif opcao == "10":
+                limpar_instancias()
             elif opcao == "0":
                 print("Saindo.")
                 break
