@@ -9,7 +9,7 @@ W_VALUES = [50, 100, 150, 200, 300]
 V_VALUES = [50, 100, 150, 200, 300]
 METHODS = ["dynamic", "bnb", "backtracking"]
 INSTANCES_PER_COMBINATION = 10
-TIMEOUT = 3600
+TIMEOUT = 7200
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXEC = os.path.join(ROOT, "app", "exe")

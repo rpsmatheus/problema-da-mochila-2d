@@ -19,7 +19,7 @@ void mochila_backtracking(Item *itens, int indice_atual, int total_itens,
     static int check_counter = 0;
     if (check_counter++ % 10000 == 0) {
         double elapsed = (double)(clock() - start_time) / CLOCKS_PER_SEC;
-        if (elapsed > 3600.0) { // Limite de 1 hora
+        if (elapsed > 7200.0) { // Limite de 2 horas
             timeout_atingido = true;
         }
     }
@@ -60,7 +60,7 @@ void exibirResultadoBacktracking(Item *itens, int total_itens, int cap_p, int ca
     int vol_total = 0;
 
     if (timeout_atingido) {
-        printf("\n[AVISO] Tempo limite de 1h atingido! Exibindo melhor solucao encontrada ate agora.\n");
+        printf("\n[AVISO] Tempo limite de 2h atingido! Exibindo melhor solucao encontrada ate agora.\n");
     }
 
     printf("Lucro máximo: R$ %d\n", maior_lucro);

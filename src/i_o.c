@@ -57,8 +57,9 @@ void readBackpackDataFile(FILE *file, int lines_amount, Backpack *backpack) {
 
     for(int i = 0 ; i < items_amount ; i++) {
         p_item = &(backpack->items[i]);
-        fgets(buffer, BUFFER_SIZE, file);
+        if (fgets(buffer, BUFFER_SIZE, file) == NULL)
+            break;
         // Lendo Peso, Volume e Valor
-        sscanf(buffer, "%u\t%d\t%d", &(p_item->weigh), &(p_item->volume), &(p_item->value));
+        sscanf(buffer, "%d %d %d", &(p_item->weigh), &(p_item->volume), &(p_item->value));
     }
 }

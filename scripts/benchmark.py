@@ -14,7 +14,7 @@ W_VALUES = [100]
 V_VALUES = [100]
 INSTANCES_PER_COMBINATION = 10
 METHODS = ["dynamic", "backtracking", "bnb"]
-TIMEOUT = 3600
+TIMEOUT = 7200
 CSV_RAW = os.path.join(ROOT, "resultados_raw.csv")
 
 def gerar_instancias(n, w, v):

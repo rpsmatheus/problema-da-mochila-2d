@@ -46,15 +46,15 @@ int main(int argc, char *argv[])
 
     // Seleção do método passando o start_time para controle de timeout
     if(!strcmp(argv[2], "dynamic")) {
-        printf("Executando Dynamic Programming...\n");
+        printf("Executando Dynamic Programming (Limite 2h)...\n");
         dynamicApproch(&backpack, start_time);
     }
     else if(!strcmp(argv[2], "backtracking")) {
-        printf("Executando Backtracking (Limite 1h)...\n");
+        printf("Executando Backtracking (Limite 2h)...\n");
         executarBacktracking(&backpack, start_time);
     }
     else if(!strcmp(argv[2], "bnb")) {
-        printf("Executando Branch and Bound (Limite 1h)...\n");
+        printf("Executando Branch and Bound (Limite 2h)...\n");
         branchAndBoundApproach(&backpack, start_time);
     }
     else {

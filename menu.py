@@ -12,6 +12,7 @@ EXEC = ROOT / "app" / "exe"
 GEN = INPUT_DIR / "generator"
 CSV_EXPERIMENTOS = ROOT / "resultados_experimentos.csv"
 STATS_MENU = ROOT / "scripts" / "stats_menu.py"
+TESTS_MENU = ROOT / "scripts" / "tests_menu.py"
 PLOTS_MENU = ROOT / "scripts" / "plots_menu.py"
 INSTANCES_PER_COMBINATION = 10
 METHODS = ["dynamic", "backtracking", "bnb"]
@@ -182,7 +183,9 @@ def rodar_experimentos(ignorar_bt=False):
                                 flush=True
                             )
 
+                            
                             lucro, tempo, timeout = rodar_algoritmo(instancia, metodo)
+                            #
                             writer.writerow([
                                 n, w, v, instance_id, metodo,
                                 f"{lucro:.5f}" if lucro is not None else "",
@@ -201,6 +204,15 @@ def gerar_tabela_estatistica():
         return
 
     subprocess.run(["/usr/bin/python3.12", str(STATS_MENU)], cwd=ROOT, check=True)
+
+
+def gerar_testes_estatisticos():
+    if not CSV_EXPERIMENTOS.exists():
+        print(f"CSV nao encontrado: {CSV_EXPERIMENTOS}")
+        print("Rode os experimentos pela opcao 2 antes de gerar os testes.")
+        return
+
+    subprocess.run(["/usr/bin/python3.12", str(TESTS_MENU)], cwd=ROOT, check=True)
 
 
 def gerar_graficos():
@@ -303,6 +315,7 @@ def menu():
         print("8 - Rodar Branch and Bound")
         print("9 - Rodar experimentos (SEM Backtracking)")
         print("10 - Limpar instancias antigas (.txt)")
+        print("11 - Gerar testes estatisticos de empate")
         print("0 - Sair")
 
         opcao = input("Escolha uma opcao: ").strip()
@@ -328,6 +341,8 @@ def menu():
                 rodar_experimentos(ignorar_bt=True)
             elif opcao == "10":
                 limpar_instancias()
+            elif opcao == "11":
+                gerar_testes_estatisticos()
             elif opcao == "0":
                 print("Saindo.")
                 break

@@ -15,6 +15,7 @@ typedef struct memo {
 static Memo m;
 static bool timeout_dynamic = false;
 
+// Alocada e inicializada com 0 
 int ***allocMemoTable(unsigned int cap_weight, unsigned int cap_volume, unsigned int items_amount)
 {
     m.table = (int***) malloc((items_amount + 1) * sizeof(int**));
@@ -30,8 +31,9 @@ int ***allocMemoTable(unsigned int cap_weight, unsigned int cap_volume, unsigned
             m.table[i][j] = (int*) malloc((cap_volume + 1) * sizeof(int));
             if(m.table[i][j] == NULL) return NULL;
 
+            
             for(unsigned int k = 0 ; k <= cap_volume ; k++)
-                m.table[i][j][k] = -1;
+                m.table[i][j][k] = 0;
         }
     }
 
@@ -54,38 +56,47 @@ void freeMemoTable()
 
 int maxValue(int a, int b) { return a > b ? a : b; }
 
-int dynamic(Item *items, int n, int w, int v, clock_t start_time)
+int dynamic(Item *items, int n, int W, int V, clock_t start_time)
 {
-    // Verificação de timeout
-    static int check_counter = 0;
-    if (check_counter++ % 10000 == 0) {
-        double elapsed = (double)(clock() - start_time) / CLOCKS_PER_SEC;
-        if (elapsed > 3600.0) {
-            timeout_dynamic = true;
-            return 0;
+    int check_counter = 0;
+
+    // Se não há itens ou capacidades, lucro é 0 
+    if(n == 0 || W <= 0 || V <= 0) return 0;
+
+    // Construção Bottom-Up
+    for (int i = 1; i <= n; i++) {
+        for (int w = 1; w <= W; w++) {
+            for (int v = 1; v <= V; v++) {
+                
+                // Verificação de timeout 
+                if (check_counter++ % 10000 == 0) {
+                    double elapsed = (double)(clock() - start_time) / CLOCKS_PER_SEC;
+                    if (elapsed > 7200.0) {
+                        timeout_dynamic = true;
+                        return 0; // Aborta 
+                    }
+                }
+
+                if (items[i - 1].weigh > w || items[i - 1].volume > v) {
+                    m.table[i][w][v] = m.table[i - 1][w][v];
+                } 
+                else {
+                    int val_without_item = m.table[i - 1][w][v];
+                    int val_with_item = m.table[i - 1][w - items[i - 1].weigh][v - items[i - 1].volume] + items[i - 1].value;
+                    
+                    m.table[i][w][v] = maxValue(val_without_item, val_with_item);
+                }
+            }
         }
     }
 
-    if(n == 0 || w <= 0 || v <= 0) return 0;
-
-    if(m.table[n][w][v] > -1) return m.table[n][w][v];
-
-    if(items[n - 1].weigh > w || items[n - 1].volume > v) {
-        m.table[n][w][v] = dynamic(items, n - 1, w, v, start_time);
-    }
-    else {
-        int res1 = dynamic(items, n - 1, w - items[n - 1].weigh, v - items[n - 1].volume, start_time) + items[n - 1].value;
-        int res2 = dynamic(items, n - 1, w, v, start_time);
-        m.table[n][w][v] = maxValue(res1, res2);
-    }
-
-    return m.table[n][w][v];
+    return m.table[n][W][V];
 }
 
 void showProfitAndItems(Item *items, int profit)
 {
     if (timeout_dynamic) {
-        printf("\n[TIMEOUT] Programacao Dinamica interrompida apos 1h!\n");
+        printf("\n[TIMEOUT] Programacao Dinamica interrompida apos 2h!\n");
     }
 
     printf("Lucro máximo: R$ %d\n", profit);
@@ -100,33 +111,31 @@ void showProfitAndItems(Item *items, int profit)
 
     while (i > 0 && j > 0 && k > 0) {
 
-    if (items[i - 1].weigh <= j &&
-        items[i - 1].volume <= k &&
-        m.table[i][j][k] ==
-            m.table[i - 1][j - items[i - 1].weigh][k - items[i - 1].volume] + items[i - 1].value)
-    {
+        // Verifica se o item i-1 foi incluído na solução ótima
+        if (items[i - 1].weigh <= j &&
+            items[i - 1].volume <= k &&
+            m.table[i][j][k] == m.table[i - 1][j - items[i - 1].weigh][k - items[i - 1].volume] + items[i - 1].value)
+        {
 
-        printf("\t(Item: %d, Valor: %d, Peso: %d, Volume: %d)\n",
-               i,
-               items[i - 1].value,
-               items[i - 1].weigh,
-               items[i - 1].volume);
+            printf("\t(Item: %d, Valor: %d, Peso: %d, Volume: %d)\n",
+                   i,
+                   items[i - 1].value,
+                   items[i - 1].weigh,
+                   items[i - 1].volume);
 
-        peso_total += items[i - 1].weigh;
-        volume_total += items[i - 1].volume;
+            peso_total += items[i - 1].weigh;
+            volume_total += items[i - 1].volume;
 
-        j -= items[i - 1].weigh;
-        k -= items[i - 1].volume;
+            j -= items[i - 1].weigh;
+            k -= items[i - 1].volume;
+        }
+
+        i--;
     }
-
-    i--;
-}
-
 
     printf("Peso total: %d / %d\n", peso_total, m.capacity_weight);
     printf("Volume total: %d / %d\n", volume_total, m.capacity_volume);
 }
-
 
 int dynamicApproch(Backpack *b, clock_t start_time)
 {

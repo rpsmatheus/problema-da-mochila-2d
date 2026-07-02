@@ -94,6 +94,7 @@ Contem scripts Python auxiliares para benchmarks, estatisticas e graficos.
 
 ```text
 scripts/stats_menu.py    -> gera tabela estatistica a partir do CSV do menu
+scripts/tests_menu.py    -> gera testes pareados de empate estatistico
 scripts/benchmark.py     -> benchmark alternativo variando N
 scripts/benchmark_mv.py  -> benchmark alternativo variando W e V
 scripts/stats.py         -> estatisticas do benchmark.py
@@ -208,6 +209,9 @@ O menu mostra:
 6 - Rodar Programacao Dinamica
 7 - Rodar Backtracking
 8 - Rodar Branch and Bound
+9 - Rodar experimentos (SEM Backtracking)
+10 - Limpar instancias antigas (.txt)
+11 - Gerar testes estatisticos de empate
 0 - Sair
 ```
 
@@ -317,6 +321,36 @@ scripts/stats_menu.py
 ```
 
 Esse script usa `pandas`.
+
+### Opcao 11 - Gerar testes estatisticos de empate
+
+Le o arquivo:
+
+```text
+resultados_experimentos.csv
+```
+
+e gera:
+
+```text
+resultados_experimentos_testes.csv
+```
+
+Para cada combinacao `N, W, V`, o script compara os metodos dois a dois usando as mesmas instancias. Como as execucoes sao pareadas por instancia, o teste usado e o teste dos sinais bilateral, com `alpha = 0.05`.
+
+A interpretacao da coluna `Resultado` e:
+
+```text
+empate_estatistico        -> nao houve evidencia suficiente de diferenca de tempo
+diferenca_significativa   -> houve diferenca estatistica; ver Metodo_Mais_Rapido
+sem_dados                 -> nao havia pares validos sem timeout
+```
+
+O script usado e:
+
+```text
+scripts/tests_menu.py
+```
 
 ### Opcao 4 - Gerar graficos da tabela estatistica
 
@@ -562,7 +596,7 @@ O menu ja faz isso automaticamente na opcao 3.
 O limite de tempo por execucao esta configurado como:
 
 ```text
-1 hora = 3600 segundos
+2 horas = 7200 segundos
 ```
 
 Esse limite vale para:
@@ -590,7 +624,7 @@ W: 100
 V: 100
 ```
 
-Para experimentos maiores, o backtracking pode levar bastante tempo, especialmente com timeout de 1 hora.
+Para experimentos maiores, o backtracking pode levar bastante tempo, especialmente com timeout de 2 horas.
 
 ## 12. Branch and Bound
 
@@ -653,6 +687,18 @@ Colunas:
 
 ```text
 N,W,V,Metodo,Execucoes,Execucoes_Validas,Timeouts,Timeout_%,Lucro_Medio,Tempo_Medio,Tempo_Desvio_Padrao,Tempo_IC_95
+```
+
+### `resultados_experimentos_testes.csv`
+
+Tabela de testes estatisticos gerada pela opcao 11 do menu.
+
+Cada linha compara dois metodos em uma combinacao `N, W, V`, usando apenas execucoes sem timeout e pareadas pela mesma instancia.
+
+Colunas:
+
+```text
+N,W,V,Metodo_A,Metodo_B,Pares_Validos,Tempo_Medio_A,Tempo_Medio_B,A_Mais_Lento_Que_B,B_Mais_Lento_Que_A,P_Valor,Alpha,Resultado,Metodo_Mais_Rapido
 ```
 
 ## 15. Comandos Mais Usados
