@@ -13,7 +13,7 @@ O sistema tambem possui gerador de instancias, menu interativo, execucao automat
 ## 1. Estrutura do Projeto
 
 ```text
-PAA-TP1-25.2/
+problema-da-mochila-2d/
 ├── main.c
 ├── Makefile
 ├── menu.py
@@ -147,7 +147,7 @@ peso volume valor
 Entre na raiz do projeto:
 
 ```bash
-cd /home/usuario/Downloads/PAA-TP1-25.2
+cd problema-da-mochila-2d
 ```
 
 Para limpar compilacoes antigas:
@@ -183,7 +183,7 @@ input_files/generator
 Fluxo completo recomendado:
 
 ```bash
-cd /home/usuario/Downloads/PAA-TP1-25.2
+cd problema-da-mochila-2d
 make clean
 make
 make gen
@@ -194,7 +194,7 @@ make gen
 Execute:
 
 ```bash
-cd /home/usuario/Downloads/PAA-TP1-25.2
+cd problema-da-mochila-2d
 python3 menu.py
 ```
 
@@ -451,7 +451,7 @@ cd input_files
 Exemplo:
 
 ```bash
-cd /home/usuario/Downloads/PAA-TP1-25.2/input_files
+cd problema-da-mochila-2d/input_files
 ./generator 200 1000 1000
 ```
 
@@ -748,7 +748,7 @@ Gerar graficos manualmente:
 1. Entrar na pasta do projeto:
 
 ```bash
-cd /home/usuario/Downloads/PAA-TP1-25.2
+cd problema-da-mochila-2d
 ```
 
 2. Abrir o menu:
